@@ -81,3 +81,31 @@ func TestIndexDown(t *testing.T) {
 		}
 	}
 }
+
+func TestPosition(t *testing.T) {
+	data := []struct {
+		Start, ExpectedRow, ExpectedColumn int
+	}{ // 01\n\n4\n67\n9
+		{-1, 0, 0},
+		{0, 0, 0},
+		{1, 0, 1},
+		{2, 0, 2},
+		{3, 1, 0},
+		{4, 2, 0},
+		{5, 2, 1},
+		{6, 3, 0},
+		{7, 3, 1},
+		{8, 3, 2},
+		{9, 4, 0},
+		{10, 4, 0},
+	}
+	for _, d := range data {
+		if row, col := Position(b, newline, d.Start); row != d.ExpectedRow || col != d.ExpectedColumn {
+			t.Errorf("Position(%v) => %v, %v expected %v, %v\n", d.Start, row, col, d.ExpectedRow, d.ExpectedColumn)
+		}
+	}
+	// Test empty buffer
+	if row, col := Position(make([]byte, 0), newline, 1); row != 0 || col != 0 {
+		t.Errorf("Position() should handle empty buffers")
+	}
+}

@@ -88,3 +88,16 @@ func IndexDown(buf, sep []byte, start int) (i int) {
 	i = begin + currentcol
 	return
 }
+
+// At returns the row and column the given index is on using sep as newline separator
+func Position(buf, sep []byte, start int) (row, column int) {
+	if start >= len(buf) {
+		start = len(buf) - 1
+	}
+	if start < 0 {
+		return
+	}
+	row = bytes.Count(buf[:start], sep)
+	column = start - bytes.LastIndex(buf[:start], sep) - 1
+	return
+}
