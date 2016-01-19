@@ -3,6 +3,19 @@ package cursor
 
 import "bytes"
 
+// Index returns the index within the buffer for a given column and line
+// If column overflows in either positive or negative buffer length determins endpoints.
+func Index(buf, sep []byte, line, column int) (i int) {
+	for l := line; l > 0; l-- {
+		i = i + bytes.Index(buf[i:], sep) + 1
+	}
+	i = i + column
+	if i < 0 {
+		i = 0
+	}
+	return
+}
+
 // IndexLeft returns the right most index of the sep character
 // to the left of start
 func IndexLeft(buf, sep []byte, start int) (i int) {
@@ -89,15 +102,15 @@ func IndexDown(buf, sep []byte, start int) (i int) {
 	return
 }
 
-// At returns the row and column the given index is on using sep as newline separator
-func Position(buf, sep []byte, start int) (row, column int) {
+// Position returns the line and column the given index is on using sep as newline separator
+func Position(buf, sep []byte, start int) (line, column int) {
 	if start >= len(buf) {
 		start = len(buf) - 1
 	}
 	if start < 0 {
 		return
 	}
-	row = bytes.Count(buf[:start], sep)
+	line = bytes.Count(buf[:start], sep)
 	column = start - bytes.LastIndex(buf[:start], sep) - 1
 	return
 }

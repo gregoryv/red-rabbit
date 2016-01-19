@@ -8,6 +8,34 @@ var newline = []byte("\n")
 var b = []byte("01\n\n4\n67\n9")
 var i int
 
+func TestIndex(t *testing.T) {
+	data := []struct {
+		Row, Column, Expected int
+	}{
+		{-1, 0, 0},
+		{-1, -1, 0},
+		{0, 0, 0},
+		{0, 1, 1},
+		{0, 2, 2},
+		{0, 3, 3}, // overflow column goes to next line
+		{1, 0, 3},
+		{2, 0, 4},
+		{2, 1, 5},
+		{3, 0, 6},
+		{3, 1, 7},
+		{3, 2, 8},
+		{4, 0, 9},
+		{15, 0, 9},   // line overflow
+		{4, -1, 8},   // backwards
+		{4, -100, 0}, // backwards overflow column
+	}
+	for _, d := range data {
+		if i := Index(b, newline, d.Row, d.Column); i != d.Expected {
+			t.Errorf("Index(%v, %v) => %v expected %v", d.Row, d.Column, i, d.Expected)
+		}
+	}
+}
+
 func TestIndexLeft(t *testing.T) {
 	data := []struct {
 		Start, Expected int
