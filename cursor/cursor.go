@@ -1,13 +1,23 @@
 // cursor movement in byte slice
 package cursor
 
-import "bytes"
-
 // Index returns the index within the buffer for a given column and line
 // If column overflows in either positive or negative buffer length determins endpoints.
-func Index(buf, sep []byte, line, column int) (i int) {
-	for l := line; l > 0; l-- {
-		i = i + bytes.Index(buf[i:], sep) + 1
+func Index(buf []rune, sep rune, line, column int) (i int) {
+	if line < 0 { // don't handle negative lines
+		return 0
+	}
+FINDLINE:
+	for i = 0; i < len(buf); i++ {
+		if line == 0 {
+			break FINDLINE
+		}
+		if sep == buf[i] { // line ending found
+			line--
+		}
+	}
+	if i == len(buf) { // We reached the end
+		i--
 	}
 	i = i + column
 	if i < 0 {
@@ -18,21 +28,40 @@ func Index(buf, sep []byte, line, column int) (i int) {
 
 // IndexLeft returns the right most index of the sep character
 // to the left of start
-func IndexLeft(buf, sep []byte, start int) (i int) {
+func IndexLeft(buf []rune, sep rune, start int) (i int) {
 	if start >= len(buf) {
 		start = len(buf) - 1
 	}
 	if start > 0 && start < len(buf) {
-		if i = bytes.LastIndex(buf[:start], sep); i > -1 {
+		return IndexLast(buf[:start], sep)
+	}
+	return 0
+}
+
+// IndexLast returns the last index of sep inside buf or 0 if none is found
+// Similar to IndexLeft but works on buf alone.
+func IndexLast(buf []rune, sep rune) (i int) {
+	for i := len(buf) - 1; i > 0; i-- {
+		if sep == buf[i] {
 			return i
 		}
 	}
 	return 0
 }
 
+// IndexRune returns the index of the first position of sep in buf
+func IndexRune(buf []rune, sep rune) (i int) {
+	for i := 0; i < len(buf); i++ {
+		if sep == buf[i] {
+			return i
+		}
+	}
+	return len(buf) - 1
+}
+
 // IndexUp moves the cursor one line up from the given index.
 // It tries to keep the column position if possible.
-func IndexUp(buf, sep []byte, start int) (i int) {
+func IndexUp(buf []rune, sep rune, start int) (i int) {
 	// make sure we're within the buffer limits
 	if start >= len(buf) {
 		start = len(buf) - 1
@@ -69,7 +98,7 @@ func IndexUp(buf, sep []byte, start int) (i int) {
 
 // IndexDown moves the cursor one line down from the given index.
 // It tries to keep the column position if possible.
-func IndexDown(buf, sep []byte, start int) (i int) {
+func IndexDown(buf []rune, sep rune, start int) (i int) {
 	// make sure we're within the buffer limits
 	if start >= len(buf) {
 		return len(buf) - 1
@@ -77,13 +106,14 @@ func IndexDown(buf, sep []byte, start int) (i int) {
 	if start < 0 {
 		start = 0
 	}
-	currentcol := start - bytes.LastIndex(buf[:start], sep) - 1
+	newlineleft := IndexLast(buf[:start], sep)
+	currentcol := start - newlineleft - 1
 	// index of the next new line
-	begin := bytes.Index(buf[start:], sep) + start
+	begin := IndexRune(buf[start:], sep) + start
 	if begin > 0 {
 		begin = begin + 1
 	}
-	endcol := bytes.Index(buf[begin:], sep)
+	endcol := IndexRune(buf[begin:], sep)
 	if endcol == -1 {
 		endcol = len(buf[begin:]) - 1
 	}
@@ -103,14 +133,28 @@ func IndexDown(buf, sep []byte, start int) (i int) {
 }
 
 // Position returns the line and column the given index is on using sep as newline separator
-func Position(buf, sep []byte, start int) (line, column int) {
+func Position(buf []rune, sep rune, start int) (line, column int) {
 	if start >= len(buf) {
 		start = len(buf) - 1
 	}
 	if start < 0 {
 		return
 	}
-	line = bytes.Count(buf[:start], sep)
-	column = start - bytes.LastIndex(buf[:start], sep) - 1
+	line = Count(buf[:start], sep)
+	if line == 0 {
+		column = start
+		return
+	}
+	column = start - IndexLast(buf[:start], sep) - 1
+	return
+}
+
+// Count returns the number of occurences of sep in buf
+func Count(buf []rune, sep rune) (c int) {
+	for i := 0; i < len(buf); i++ {
+		if sep == buf[i] {
+			c++
+		}
+	}
 	return
 }
