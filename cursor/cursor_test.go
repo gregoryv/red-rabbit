@@ -5,7 +5,7 @@ import (
 )
 
 var nlr = '\n'
-var b = []byte("01\n\nö\n78\nx")
+var b = []byte("ab\n\nö\ncd\nf")
 var r = []rune(string(b))
 
 /*
@@ -191,12 +191,12 @@ func TestCount(t *testing.T) {
 		Expected int
 	}{
 		{nlr, 4},
-		{'0', 1},
-		{'1', 1},
+		{'a', 1},
+		{'b', 1},
 		{'ö', 1},
-		{'7', 1},
-		{'8', 1},
-		{'x', 1},
+		{'c', 1},
+		{'d', 1},
+		{'f', 1},
 		{'n', 0},
 	}
 	for _, d := range data {
