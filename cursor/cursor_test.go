@@ -1,5 +1,10 @@
 package cursor
 
+/*
+	Moving cursor around a []rune.
+
+	Index values start at 0, while line and columns start with 1.
+*/
 import (
 	"testing"
 )
@@ -10,12 +15,13 @@ var r = []rune(string(b))
 
 /*
 	The indexes are
+	column: 123456
 	---------------
-	line 0: 012
-	line 1: 3
-	line 2: 45
-	line 3: 678
-	line 4: 9
+	line 1: 012
+	     2: 3
+	     3: 45
+	     4: 678
+	     5: 9
 	---------------
 */
 
@@ -38,20 +44,20 @@ func TestIndex(t *testing.T) {
 	}{
 		{-1, 0, 0},
 		{-1, -1, 0},
-		{0, 0, 0},
-		{0, 1, 1},
-		{0, 2, 2},
-		{0, 3, 3}, // overflow column goes to next line
-		{1, 0, 3},
-		{2, 0, 4},
-		{2, 1, 5},
-		{3, 0, 6},
-		{3, 1, 7},
-		{3, 2, 8},
-		{4, 0, 9},
-		{15, 0, 9},   // line overflow
-		{4, -1, 8},   // backwards
-		{4, -100, 0}, // backwards overflow column
+		{1, 1, 0},
+		{1, 2, 1},
+		{1, 3, 2},
+		{1, 4, 3}, // overflow column goes to next line
+		{2, 1, 3},
+		{3, 1, 4},
+		{3, 2, 5},
+		{4, 1, 6},
+		{4, 2, 7},
+		{4, 3, 8},
+		{5, 1, 9},
+		{16, 1, 9},   // line overflow
+		{5, -1, 8},   // backwards
+		{5, -100, 0}, // backwards overflow column
 	}
 	for _, d := range data {
 		if i := Index(r[:], nlr, d.Row, d.Column); i != d.Expected {
@@ -161,18 +167,18 @@ func TestPosition(t *testing.T) {
 	data := []struct {
 		Start, ExpectedRow, ExpectedColumn int
 	}{
-		{-1, 0, 0},
-		{0, 0, 0},
-		{1, 0, 1},
-		{2, 0, 2}, // newline
-		{3, 1, 0}, // newline
-		{4, 2, 0},
-		{5, 2, 1},
-		{6, 3, 0},
-		{7, 3, 1},
-		{8, 3, 2},
-		{9, 4, 0},
-		{10, 4, 0},
+		{-1, 1, 1},
+		{0, 1, 1},
+		{1, 1, 2},
+		{2, 1, 3}, // newline
+		{3, 2, 1}, // newline
+		{4, 3, 1},
+		{5, 3, 2},
+		{6, 4, 1},
+		{7, 4, 2},
+		{8, 4, 3},
+		{9, 5, 1},
+		{10, 5, 1},
 	}
 	for _, d := range data {
 		if row, col := Position(r[:], nlr, d.Start); row != d.ExpectedRow || col != d.ExpectedColumn {
@@ -180,7 +186,7 @@ func TestPosition(t *testing.T) {
 		}
 	}
 	// Test empty buffer
-	if row, col := Position(make([]rune, 0), nlr, 1); row != 0 || col != 0 {
+	if row, col := Position(make([]rune, 0), nlr, 1); row != 1 || col != 1 {
 		t.Errorf("Position() should handle empty buffers")
 	}
 }

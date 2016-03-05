@@ -3,16 +3,20 @@ package cursor
 
 // Index returns the index within the buffer for a given column and line
 // If column overflows in either positive or negative buffer length determins endpoints.
+// line starts with 1
+// column starts with 1
+// returned index starts with 0
 func Index(buf []rune, sep rune, line, column int) (i int) {
-	if line < 0 { // don't handle negative lines
+	if line < 1 { // don't handle negative lines
 		return 0
 	}
+	// Move index forward for each line
 FINDLINE:
 	for i = 0; i < len(buf); i++ {
-		if line == 0 {
+		if line == 1 {
 			break FINDLINE
 		}
-		if sep == buf[i] { // line ending found
+		if buf[i] == sep { // line ending found
 			line--
 		}
 	}
@@ -20,6 +24,9 @@ FINDLINE:
 		i--
 	}
 	i = i + column
+	if column > 0 {
+		i--
+	}
 	if i < 0 {
 		i = 0
 	}
@@ -133,19 +140,23 @@ func IndexDown(buf []rune, sep rune, start int) (i int) {
 }
 
 // Position returns the line and column the given index is on using sep as newline separator
+// Lines and columns start with 1
 func Position(buf []rune, sep rune, start int) (line, column int) {
+	line = 1
+	column = 1
 	if start >= len(buf) {
 		start = len(buf) - 1
 	}
 	if start < 0 {
 		return
 	}
-	line = Count(buf[:start], sep)
-	if line == 0 {
-		column = start
+	// On the first line
+	line = Count(buf[:start], sep) + 1
+	if line == 1 {
+		column = start + 1
 		return
 	}
-	column = start - IndexLast(buf[:start], sep) - 1
+	column = start - IndexLast(buf[:start], sep)
 	return
 }
 
