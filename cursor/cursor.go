@@ -34,13 +34,13 @@ FINDLINE:
 }
 
 // IndexLeft returns the right most index of the sep character
-// to the left of start
-func IndexLeft(buf []rune, sep rune, start int) (i int) {
-	if start >= len(buf) {
-		start = len(buf) - 1
+// to the left of index
+func IndexLeft(buf []rune, sep rune, index int) (i int) {
+	if index >= len(buf) {
+		index = len(buf) - 1
 	}
-	if start > 0 && start < len(buf) {
-		return IndexLast(buf[:start], sep)
+	if index > 0 && index < len(buf) {
+		return IndexLast(buf[:index], sep)
 	}
 	return 0
 }
@@ -68,18 +68,18 @@ func IndexRune(buf []rune, sep rune) (i int) {
 
 // IndexUp moves the cursor one line up from the given index.
 // It tries to keep the column position if possible.
-func IndexUp(buf []rune, sep rune, start int) (i int) {
+func IndexUp(buf []rune, sep rune, index int) (i int) {
 	// make sure we're within the buffer limits
-	if start >= len(buf) {
-		start = len(buf) - 1
+	if index >= len(buf) {
+		index = len(buf) - 1
 	}
-	if start < 0 {
+	if index < 0 {
 		return 0
 	}
 	// Move to end of previous line
-	end := IndexLeft(buf, sep, start)
+	end := IndexLeft(buf, sep, index)
 	// Which column are we at now?
-	currentcol := start - end - 1
+	currentcol := index - end - 1
 	// We are at the first character
 	if end == 0 {
 		return 0
@@ -105,18 +105,18 @@ func IndexUp(buf []rune, sep rune, start int) (i int) {
 
 // IndexDown moves the cursor one line down from the given index.
 // It tries to keep the column position if possible.
-func IndexDown(buf []rune, sep rune, start int) (i int) {
+func IndexDown(buf []rune, sep rune, index int) (i int) {
 	// make sure we're within the buffer limits
-	if start >= len(buf) {
+	if index >= len(buf) {
 		return len(buf) - 1
 	}
-	if start < 0 {
-		start = 0
+	if index < 0 {
+		index = 0
 	}
-	newlineleft := IndexLast(buf[:start], sep)
-	currentcol := start - newlineleft - 1
+	newlineleft := IndexLast(buf[:index], sep)
+	currentcol := index - newlineleft - 1
 	// index of the next new line
-	begin := IndexRune(buf[start:], sep) + start
+	begin := IndexRune(buf[index:], sep) + index
 	if begin > 0 {
 		begin = begin + 1
 	}
@@ -139,24 +139,25 @@ func IndexDown(buf []rune, sep rune, start int) (i int) {
 	return
 }
 
-// Position returns the line and column the given index is on using sep as newline separator
+// Position returns the line and column the given index(i) is on using sep as newline separator
 // Lines and columns start with 1
-func Position(buf []rune, sep rune, start int) (line, column int) {
+func Position(buf []rune, sep rune, i int) (line, column, index int) {
 	line = 1
 	column = 1
-	if start >= len(buf) {
-		start = len(buf) - 1
+	if i >= len(buf) {
+		i = len(buf) - 1
 	}
-	if start < 0 {
-		return
+	if i < 0 {
+		return line, column, 0
 	}
+	index = i
 	// On the first line
-	line = Count(buf[:start], sep) + 1
+	line = Count(buf[:i], sep) + 1
 	if line == 1 {
-		column = start + 1
+		column = i + 1
 		return
 	}
-	column = start - IndexLast(buf[:start], sep)
+	column = i - IndexLast(buf[:i], sep)
 	return
 }
 

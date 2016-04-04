@@ -40,7 +40,7 @@ func TestSetup(t *testing.T) {
 
 func TestIndex(t *testing.T) {
 	data := []struct {
-		Row, Column, Expected int
+		Line, Column, Expected int
 	}{
 		{-1, 0, 0},
 		{-1, -1, 0},
@@ -60,8 +60,8 @@ func TestIndex(t *testing.T) {
 		{5, -100, 0}, // backwards overflow column
 	}
 	for _, d := range data {
-		if i := Index(r[:], nlr, d.Row, d.Column); i != d.Expected {
-			t.Errorf("Index(%v, %v) => %v expected %v", d.Row, d.Column, i, d.Expected)
+		if i := Index(r[:], nlr, d.Line, d.Column); i != d.Expected {
+			t.Errorf("Index(%v, %v) => %v expected %v", d.Line, d.Column, i, d.Expected)
 		}
 	}
 }
@@ -165,28 +165,28 @@ func TestIndexDown(t *testing.T) {
 
 func TestPosition(t *testing.T) {
 	data := []struct {
-		Start, ExpectedRow, ExpectedColumn int
+		Index, ExpectedLine, ExpectedColumn, ExpectedIndex int
 	}{
-		{-1, 1, 1},
-		{0, 1, 1},
-		{1, 1, 2},
-		{2, 1, 3}, // newline
-		{3, 2, 1}, // newline
-		{4, 3, 1},
-		{5, 3, 2},
-		{6, 4, 1},
-		{7, 4, 2},
-		{8, 4, 3},
-		{9, 5, 1},
-		{10, 5, 1},
+		{-1, 1, 1, 0},
+		{0, 1, 1, 0},
+		{1, 1, 2, 1},
+		{2, 1, 3, 2}, // newline
+		{3, 2, 1, 3}, // newline
+		{4, 3, 1, 4},
+		{5, 3, 2, 5},
+		{6, 4, 1, 6},
+		{7, 4, 2, 7},
+		{8, 4, 3, 8},
+		{9, 5, 1, 9},
+		{10, 5, 1, 9},
 	}
 	for _, d := range data {
-		if row, col := Position(r[:], nlr, d.Start); row != d.ExpectedRow || col != d.ExpectedColumn {
-			t.Errorf("Position(%v) => %v, %v expected %v, %v\n", d.Start, row, col, d.ExpectedRow, d.ExpectedColumn)
+		if line, col, index := Position(r[:], nlr, d.Index); line != d.ExpectedLine || col != d.ExpectedColumn || index != d.ExpectedIndex {
+			t.Errorf("Position(%v) => %v, %v, %v expected %v, %v, %v\n", d.Index, line, col, index, d.ExpectedLine, d.ExpectedColumn, d.ExpectedIndex)
 		}
 	}
 	// Test empty buffer
-	if row, col := Position(make([]rune, 0), nlr, 1); row != 1 || col != 1 {
+	if line, col, index := Position(make([]rune, 0), nlr, 1); line != 1 || col != 1 || index != 0 {
 		t.Errorf("Position() should handle empty buffers")
 	}
 }
