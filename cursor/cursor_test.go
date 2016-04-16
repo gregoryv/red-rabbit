@@ -163,6 +163,27 @@ func TestIndexDown(t *testing.T) {
 	}
 }
 
+func TestIndexDown2(t *testing.T) {
+	buf := []rune(`ab
+cde
+
+f`)
+	data := []struct {
+		Start, Expected int
+	}{
+		{0, 3},
+		{3, 7},
+		{7, 8},
+		{8, 8},
+	}
+	for _, d := range data {
+		if i = IndexDown(buf, nlr, d.Start); i != d.Expected {
+			msg := "IndexDown(%v) => %v expected %v \n%s"
+			t.Errorf(msg, d.Start, i, d.Expected, b)
+		}
+	}
+}
+
 func TestPosition(t *testing.T) {
 	data := []struct {
 		Index, ExpectedLine, ExpectedColumn, ExpectedIndex int
@@ -209,6 +230,31 @@ func TestCount(t *testing.T) {
 		result := Count(r[:], d.Char)
 		if result != d.Expected {
 			t.Errorf("Count('%v') => %v expected %v", d.Char, result, d.Expected)
+		}
+	}
+}
+
+// 	"ab\n\nö\ncd\nf
+func TestLineBefore(t *testing.T) {
+	data := []struct {
+		Index    int
+		Expected string
+	}{
+		{0, ""},
+		{1, "a"},
+		{2, "ab"},
+		{3, ""},
+		{4, ""},
+		{5, "ö"},
+		{6, ""},
+		{7, "c"},
+		{8, "cd"},
+		{9, ""},
+		{10, "f"},
+	}
+	for _, d := range data {
+		if str := LineBefore(r, nlr, d.Index); string(str) != d.Expected {
+			t.Errorf("LineBefore(%v) => '%v' expected '%v'", d.Index, string(str), d.Expected)
 		}
 	}
 }

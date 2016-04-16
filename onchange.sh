@@ -13,6 +13,7 @@ case $extension in
     if [ $? -eq 0 ]; then
       gofmt -w $path
     fi
+
     ;;
   *)
     ;;

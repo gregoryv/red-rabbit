@@ -2,7 +2,7 @@
 package cursor
 
 // Index returns the index within the buffer for a given column and line
-// If column overflows in either positive or negative buffer length determins endpoints.
+// If column overflows in either positive or negative, buffer length determins endpoints.
 // line starts with 1
 // column starts with 1
 // returned index starts with 0
@@ -113,8 +113,11 @@ func IndexDown(buf []rune, sep rune, index int) (i int) {
 	if index < 0 {
 		index = 0
 	}
+	currentcol := index
 	newlineleft := IndexLast(buf[:index], sep)
-	currentcol := index - newlineleft - 1
+	if newlineleft != 0 {
+		currentcol = index - newlineleft - 1
+	}
 	// index of the next new line
 	begin := IndexRune(buf[index:], sep) + index
 	if begin > 0 {
@@ -168,5 +171,20 @@ func Count(buf []rune, sep rune) (c int) {
 			c++
 		}
 	}
+	return
+}
+
+// LineBefore returns slice from the given index up to the first separator
+func LineBefore(buf []rune, sep rune, i int) (r []rune) {
+	f := IndexLeft(buf, sep, i)
+	if buf[f] == sep {
+		k := f + 1
+		if k == i {
+			return []rune("")
+		}
+		return buf[k:i]
+	}
+	r = buf[f:i]
+
 	return
 }
