@@ -179,7 +179,30 @@ f`)
 	for _, d := range data {
 		if i = IndexDown(buf, nlr, d.Start); i != d.Expected {
 			msg := "IndexDown(%v) => %v expected %v \n%s"
-			t.Errorf(msg, d.Start, i, d.Expected, b)
+			t.Errorf(msg, d.Start, i, d.Expected, string(buf))
+		}
+	}
+}
+
+// Only empty lines
+func TestIndexDown_empty_lines_only(t *testing.T) {
+	// 3 empty lines
+	buf := []rune(`
+
+
+`)
+	data := []struct {
+		Start, Expected int
+	}{
+		{0, 1},
+		{1, 2},
+		{2, 2},
+		{3, 2},
+	}
+	for _, d := range data {
+		if i = IndexDown(buf, nlr, d.Start); i != d.Expected {
+			msg := "IndexDown(%v) => %v expected %v \n%slen=%v"
+			t.Errorf(msg, d.Start, i, d.Expected, string(buf), len(buf))
 		}
 	}
 }
