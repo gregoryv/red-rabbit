@@ -179,29 +179,7 @@ f`)
 	for _, d := range data {
 		if i = IndexDown(buf, nlr, d.Start); i != d.Expected {
 			msg := "IndexDown(%v) => %v expected %v \n%s"
-			t.Errorf(msg, d.Start, i, d.Expected, string(buf))
-		}
-	}
-}
-
-func TestIndexDown3(t *testing.T) {
-	// 3 empty lines
-	buf := []rune(`
-
-
-`)
-	data := []struct {
-		Start, Expected int
-	}{
-		{0, 1},
-		{1, 2},
-		{2, 3},
-		{3, 3},
-	}
-	for _, d := range data {
-		if i = IndexDown(buf, nlr, d.Start); i != d.Expected {
-			msg := "IndexDown(%v) => %v expected %v \n%slen=%v"
-			t.Errorf(msg, d.Start, i, d.Expected, string(buf), len(buf))
+			t.Errorf(msg, d.Start, i, d.Expected, b)
 		}
 	}
 }
