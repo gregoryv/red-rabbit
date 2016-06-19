@@ -108,23 +108,24 @@ func IndexUp(buf []rune, sep rune, index int) (i int) {
 func IndexDown(buf []rune, sep rune, index int) (i int) {
 	// make sure we're within the buffer limits
 	if index >= len(buf) {
-		return len(buf) - 1
+		return len(buf)
 	}
 	if index < 0 {
 		index = 0
 	}
-	currentcol := index
+	currentcol := index // first line
+	// calculate current column when index is on another line
 	newlineleft := IndexLast(buf[:index], sep)
 	if newlineleft != 0 {
 		currentcol = index - newlineleft - 1
 	}
 	// index of the next new line
 	begin := IndexRune(buf[index:], sep) + index
-	if begin > 0 {
+	if begin >= 0 {
 		begin = begin + 1
 	}
 	endcol := IndexRune(buf[begin:], sep)
-	if endcol == -1 {
+	if endcol == -1 { // there is no ending, eg. no newline at EOF
 		endcol = len(buf[begin:]) - 1
 	}
 	if endcol == 0 { // means we're on empty line
