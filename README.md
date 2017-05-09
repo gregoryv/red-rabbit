@@ -20,3 +20,10 @@ you will get the last index.
 
 Note that the index values start with 0 while lines and columns 
 begin with 1.
+
+
+man
+---
+
+Package for writing more elaborate help for eg. command line
+tools.

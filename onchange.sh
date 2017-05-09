@@ -9,11 +9,9 @@ extension="${filename##*.}"
 
 case $extension in
   go)
-    go test github.com/gregoryv/red-rabbit/cursor
-    if [ $? -eq 0 ]; then
       gofmt -w $path
-    fi
-
+      go test github.com/gregoryv/red-rabbit/cursor
+      go test github.com/gregoryv/red-rabbit/man
     ;;
   *)
     ;;
