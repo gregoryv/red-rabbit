@@ -257,7 +257,7 @@ func TestCount(t *testing.T) {
 	}
 }
 
-// 	"ab\n\nö\ncd\nf
+// "ab\n\nö\ncd\nf
 func TestLineBefore(t *testing.T) {
 	data := []struct {
 		Index    int

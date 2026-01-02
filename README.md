@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/gregoryv/red-rabbit.svg)](https://travis-ci.org/gregoryv/red-rabbit)
+ARCHIVED! Moved to https://sogvin.com/red-rabbit
 
 ![](redrabbit.png)
 
